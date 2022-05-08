@@ -16,7 +16,7 @@ module biphase_encoder #(
 
   output logic biphase_out, // NRZ data output
   output logic clock_out,
-  output logic busy,
+  output logic busy,        // TODO
 
   // Debugging outputs
   output logic dbg_first_half,
@@ -46,17 +46,19 @@ assign dbg_current_bit = current_bit;
 
 assign next_out_counter = out_counter - COUNTER_1;
 
-// This is our output routine, lowest level
+// This is our output routine, lowest level.
 always_ff @(posedge clk) begin
 
   if (out_counter == '0) begin
     // Start counting down again for our next half-bit
-    out_counter <= SHORT_PULSE;
+    out_counter <= SHORT_PULSE[COUNTER_SIZE-1:0];
 
-    if (first_half)
+    if (first_half) begin
       // We always toggle our output at the beginning...
       biphase_out <= ~biphase_out;
-    else if (current_bit == '0)
+      // And our clock output is always toggling every LONG (2x SHORT) pulses
+      clock_out <= ~clock_out;
+    end else if (current_bit == '0)
       // If we are half way through, we need to toggle our
       // output if we are sending a 0 (spacing).
       biphase_out <= ~biphase_out;
