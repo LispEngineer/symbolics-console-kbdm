@@ -23,8 +23,6 @@ module biphase_encoder #(
   output logic dbg_current_bit
 );
 
-initial clock_out = '0;
-
 localparam COUNTER_SIZE = $clog2(SHORT_PULSE);
 localparam COUNTER_1 = { {(COUNTER_SIZE-1){1'b0}}, 1'b1};
 
@@ -49,7 +47,15 @@ assign next_out_counter = out_counter - COUNTER_1;
 // This is our output routine, lowest level.
 always_ff @(posedge clk) begin
 
-  if (out_counter == '0) begin
+  if (rst) begin
+    // Otherwise these don't get initial values in simulation
+    // despite these getting default 0 values in their registers
+    // from the FPGA.
+    biphase_out <= '0;
+    clock_out <= '0;
+    first_half <= '1;
+
+  end else if (out_counter == '0) begin
     // Start counting down again for our next half-bit
     out_counter <= SHORT_PULSE[COUNTER_SIZE-1:0];
 
@@ -82,15 +88,16 @@ always_ff @(posedge clk) begin
 
   if (rst) begin
     // We are marking when we're in reset (idle)
-    current_bit = '1;
+    current_bit <= '1;
 
     // TODO: Should we be busy when reseting?
-    busy = '1;
+    busy <= '1;
 
     // TODO: Move the state machine to IDLE
 
-  end else if (out_counter == '0) begin
-    current_bit = ~current_bit;
+  // FOR TESTING PURPOSES ONLY: Send alternating bits
+  end else if (out_counter == '0 && first_half) begin
+    current_bit <= ~current_bit;
   end
 
 end

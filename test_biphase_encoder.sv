@@ -56,7 +56,7 @@ initial begin
   reset <= 1'b1; 
   #22; reset <= 1'b0;
   // Stop the simulation at appropriate point
-  #501;
+  #5001;
   $display("Ending simulation @ ", $time);
   $stop; // $stop = breakpoint
   // DO NOT USE $finish; it will exit Questa!!!
