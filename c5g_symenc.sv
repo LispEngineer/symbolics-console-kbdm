@@ -1,5 +1,11 @@
 // Copyright 2022 Douglas P. Fields, Jr. All Rights Reserved.
 
+`ifdef IS_QUARTUS // Defined in Assignments -> Settings -> ... -> Verilog HDL Input
+// This doesn't work in Questa for some reason. vlog-2892 errors.
+`default_nettype none // Disable implicit creation of undeclared nets
+`endif
+
+
 module c5g_symenc(
 
   //////////// CLOCK //////////
@@ -64,6 +70,8 @@ logic [6:0] HEX2, HEX3;
 // 7 Segment outputs
 logic [6:0] ss0, ss1, ss2, ss3;
 
+logic biphase_out;
+
 
 // ======================================================
 // DEFAULTS (remove if using these pins)
@@ -79,7 +87,9 @@ assign SD_CLK = '0;
 assign SRAM_D = 'z;
 assign {SD_CMD, SD_DAT} = 'z;
 // Rest of GPIO used for HEX2-3
-assign GPIO[21:0] = 'z;
+// GPIO 5 = Biphase encoded data stream out
+assign GPIO[21:6] = 'z;
+assign GPIO[4:0] = 'z;
 
 //=======================================================
 //  Structural coding
@@ -118,7 +128,34 @@ seven_segment hex3 (
 );
 
 
+// Hook up our encoder
+assign GPIO[5] = biphase_out;
+
+biphase_encoder biphase_enc (
+  .clk(clock),
+  .rst(reset),
+
+  // TODO
+  .data_ready('0), .data_in('0),
+
+  // Our encoded data stream output
+  .biphase_out(biphase_out),
+
+  // TODO
+  .clock_out(), .busy(),
+
+  // TODO: Debugging outputs
+  .dbg_first_half(), .dbg_current_bit()
+);
 
 
 
 endmodule
+
+
+`ifdef IS_QUARTUS // Defined in Assignments -> Settings -> ... -> Verilog HDL Input
+// Restore the default_nettype to prevent side effects
+// See: https://front-end-verification.blogspot.com/2010/10/implicit-net-declartions-in-verilog-and.html
+// and: https://sutherland-hdl.com/papers/2006-SNUG-Boston_standard_gotchas_presentation.pdf
+`default_nettype wire // turn implicit nets on again to avoid side-effects
+`endif

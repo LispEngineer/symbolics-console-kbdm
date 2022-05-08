@@ -12,4 +12,6 @@
 * Idle = marking (1's)
 * Encoding = 1 start bit, 8 data bits, 1 stop bit
 
+This encoding is then converted to RS-422 logic levels and sent to the CPU.
+
 # References
