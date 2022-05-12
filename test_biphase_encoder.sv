@@ -24,6 +24,7 @@ end
 
 // Create our device under test (biphase encoder)
 logic biphase_out;
+logic busy_out;
 logic dbg_first_half;
 logic dbg_current_bit;
 
@@ -34,14 +35,17 @@ biphase_encoder #(
   .clk(clock),
   .rst(reset),
 
-  // TODO
-  .data_ready('0), .data_in('0),
+  // Just keep repeating this data
+  .data_ready('1),
+  // Data is sent LSB first
+  .data_in(8'b1010_0111),
 
   // Our encoded data stream output
   .biphase_out,
 
   // TODO
-  .clock_out(), .busy(),
+  .clock_out(), 
+  .busy(busy_out),
 
   // Debugging outputs
   .dbg_first_half, 
