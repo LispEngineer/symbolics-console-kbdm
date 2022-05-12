@@ -95,3 +95,5 @@ Misc
 * [See here](https://verificationacademy.com/forums/systemverilog/error-suppressible-vlog-7061-alwaysff-modelsim) for some information on the vlog-7061 Questa error
 
 # References
+
+* [Quartus Verilog HDL Synthesis Attributes](https://www.intel.com/content/www/us/en/programmable/quartushelp/17.0/hdl/vlog/vlog_file_dir.htm)
