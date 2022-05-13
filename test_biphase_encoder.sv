@@ -8,8 +8,7 @@
 
 // Tick at 1ns (using #<num>) to a precision of 0.1ns (100ps)
 `timescale 1 ns / 100 ps
-// This makes for approximately 320ns between I2C clock pulses when
-// things are running stable-state.
+
 module test_biphase_encoder();
 
 // Simulator generated clock & reset
