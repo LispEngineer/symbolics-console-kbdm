@@ -93,6 +93,20 @@ Misc
 * If you accidentally create a Wave Window Pane: `Wave -> Delete Window Pane`
 * Questa PDF documentation is in the `Help` menu
 * [See here](https://verificationacademy.com/forums/systemverilog/error-suppressible-vlog-7061-alwaysff-modelsim) for some information on the vlog-7061 Questa error
+* To stop Questa/ModelSim from opening up the source file in its internal editor
+  when `$stop` is encountered:
+  * Tools -> Edit preference -> By Name -> Source -> OpenOnBreak: Set to '0' 
+  * [Source](https://www.edaboard.com/threads/modelsim-error-assertion-causes-file-to-open.246441/)
+
+
+# DEBUGGING
+
+Notes to self to pick up mental state next time:
+
+* Simulation at point 24210 contains one bit error in UART decode on (32-value bit)
+* Errors continue until we hit the top of the encoder sequence plus one
+* No received data at all at 116,150
+* At 146,810 dta is received late?
 
 # References
 

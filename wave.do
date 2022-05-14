@@ -26,12 +26,14 @@ add wave -noupdate /test_biphase_encoder/biphase_to_nrz/counter_overflow
 add wave -noupdate /test_biphase_encoder/biphase_to_nrz/counter
 add wave -noupdate -divider {UART Decoder}
 add wave -noupdate /test_biphase_encoder/uart_rx/r_Rx_Data
+add wave -noupdate /test_biphase_encoder/uart_rx/r_Clock_Count
+add wave -noupdate /test_biphase_encoder/uart_rx/r_Bit_Index
 add wave -noupdate -radix binary /test_biphase_encoder/uart_rx/state
 add wave -noupdate /test_biphase_encoder/uart_rx/data_valid
-add wave -noupdate -radix unsigned -radixshowbase 1 /test_biphase_encoder/uart_rx/data_byte
-add wave -noupdate -radix unsigned /test_biphase_encoder/data_in
+add wave -noupdate -color White -radix binary -radixshowbase 1 /test_biphase_encoder/uart_rx/data_byte
+add wave -noupdate -color Gray60 -radix binary /test_biphase_encoder/data_in
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {24344671 ps} 0}
+WaveRestoreCursors {{Cursor 1} {24210000 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 258
 configure wave -valuecolwidth 100
@@ -47,4 +49,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {0 ps} {28675758 ps}
+WaveRestoreZoom {23459624 ps} {24960377 ps}

@@ -15,6 +15,9 @@ module test_biphase_encoder();
 logic  clock;
 logic  reset;
 
+// Last byte sent to the encoder
+logic [7:0] last_sent_to_encoder;
+
 // generate clock to sequence tests
 always begin
   // 50 Mhz (one full cycle every 20 ticks at 1ns per tick per above)
@@ -133,7 +136,7 @@ uart_rx #(
 always_ff @(posedge clock) begin
   if (uart_data_valid)
     $display("UART data received   @ ", $time, "           - DATA - ", 
-             uart_data_byte, " R");
+             uart_data_byte, " R - DIFF: ", (last_sent_to_encoder - uart_data_byte));
 end
 
 
@@ -148,6 +151,10 @@ end
 logic [4:0] round_num;
 logic [4:0] start_delay;
 logic       last_busy_out;
+logic [7:0] next_to_send;
+
+// Make the byte we send each time different.
+assign next_to_send = {1'b1, round_num, 2'b01};
 
 // Send a character every time it is not busy,
 // after waiting a different number of cycles each time.
@@ -176,12 +183,11 @@ always_ff @(posedge clock) begin
           (round_num == 0 && last_busy_out)) begin
         $display("Starting to send     @ ", $time, " ", 
                  start_delay, " ", round_num, " ", last_busy_out,
-                 "   - DATA - ", {1'b1, round_num, 2'b01}, " T");
+                 "   - DATA - ", next_to_send, " T");
         // Send the data!
         data_ready <= '1;
-        data_in[7] <= '1;
-        data_in[6:2] <= round_num;
-        data_in[1:0] <= 2'b01;
+        data_in <= next_to_send;
+        last_sent_to_encoder <= next_to_send;
       end
 
     end else begin
