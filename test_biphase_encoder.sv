@@ -21,6 +21,14 @@ always begin
   #10 clock <= ~clock;
 end
 
+// Shared parameters for the test
+localparam ENCODER_SHORT_PULSE = 10;
+localparam DECODER_SHORT_PULSE = 7; // 75%-ish of the encoder length
+localparam DECODER_IGNORE_PULSE = 3;
+
+//////////////////////////////////////////////////////////////
+// Our device under test - the biphase encoder
+
 // Create our device under test (biphase encoder)
 logic biphase_out;
 logic busy_out;
@@ -33,7 +41,7 @@ logic [7:0] data_in;
 
 biphase_encoder #(
   // We don't need to do 75 kHz; we can do much faster for our simulator
-  .SHORT_PULSE(10)
+  .SHORT_PULSE(ENCODER_SHORT_PULSE)
 ) dut ( // Device Under Test
   .clk(clock),
   .rst(reset),
@@ -46,14 +54,53 @@ biphase_encoder #(
   // Our encoded data stream output
   .biphase_out,
 
-  // TODO
-  .clock_out(), 
+  .clock_out(),   // TODO
   .busy(busy_out),
 
   // Debugging outputs
   .dbg_first_half, 
   .dbg_current_bit
 );
+
+///////////////////////////////////////////////////////////////
+// Let's see if we can decode the biphase, and then run the
+// NRZ through a UART...
+
+logic nrz_out;            // The logic level output (feed into UART decoder)
+logic nrz_data_received;  // pulses when we have a valid nrz_out complete bit
+logic nrz_framing_error;  // Pulses when we notice a biphase framing error
+logic nrz_glitch_ignored; // Pulses when we notice a glitch (short biphase pulse)
+logic dbg_nrz_counter_overflow;
+
+biphase_to_nrz #(
+  .SHORT_PULSE(DECODER_SHORT_PULSE),
+  .IGNORE_PULSE(DECODER_IGNORE_PULSE)
+) biphase_to_nrz (
+  .clk(clock),
+  .rst(reset),
+
+  // Inputs
+  .biphase_in_raw(biphase_out),
+
+  // Outputs
+  .nrz_out,
+  .clock_out(), // TODO
+  .data_received(nrz_data_received),
+  .framing_error(nrz_framing_error),
+  .glitch_ignored(nrz_glitch_ignored),
+
+  // Debugging outputs
+  .counter_overflow(dbg_nrz_counter_overflow)
+);
+
+always_ff @(posedge clock) begin
+  if (nrz_framing_error)
+    $display("NRZ framing error    @ ", $time);
+  if (nrz_glitch_ignored)
+    $display("NRZ glitch ignored   @ ", $time);
+  if (dbg_nrz_counter_overflow)
+    $display("NRZ counter overflow @ ", $time);
+end
 
 ///////////////////////////////////////////////////////////////
 // Data driver for the test.
