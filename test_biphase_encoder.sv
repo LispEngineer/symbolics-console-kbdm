@@ -79,7 +79,10 @@ biphase_to_nrz #(
   .clk(clock),
   .rst(reset),
 
-  // Inputs
+  // Inputs - remember that the decoder puts the input
+  // through a synchronizer chain (irrelevant for simulation,
+  // but important for avoiding real-world metastability) that
+  // adds a few cycles of latency before decoding.
   .biphase_in_raw(biphase_out),
 
   // Outputs
