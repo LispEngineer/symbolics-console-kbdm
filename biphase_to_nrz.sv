@@ -117,7 +117,9 @@ always_ff @(posedge clk) begin
     data_received <= '0;
     framing_error <= '0;
     glitch_ignored <= '0;
-    // Data and clock_out are irrelevant
+    // Data and clock_out are irrelevant, but...
+    // clock_out has to be reset for simulation
+    clock_out <= '0;
 
   end else if (biphase_last == biphase_in) begin ///////////////////////////////////
     // Handle no transition
