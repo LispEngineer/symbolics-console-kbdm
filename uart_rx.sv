@@ -6,9 +6,11 @@
 // 3. Expand the clock to 12 bits from 8
 // 4. TODO: Add an assertion that CLKS_PER_BIT is less than the 12 bit counter
 // 5. Reformat
+//
+// Transplanted into this project from C5G_UART project on 2022-05-14.
 
 //////////////////////////////////////////////////////////////////////
-// File Downloaded from http://www.nandland.com
+// File (originally) Downloaded from http://www.nandland.com
 //////////////////////////////////////////////////////////////////////
 // This file contains the UART Receiver.  This receiver is able to
 // receive 8 bits of serial data, one start bit, one stop bit,
@@ -19,7 +21,7 @@
 // CLKS_PER_BIT = (Frequency of clock)/(Frequency of UART)
 // Example: 10 MHz Clock, 115200 baud UART
 // (10000000)/(115200) = 87
-  
+
 module uart_rx #(
   parameter CLKS_PER_BIT
 ) (

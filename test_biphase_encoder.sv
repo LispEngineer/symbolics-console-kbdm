@@ -62,6 +62,7 @@ biphase_encoder #(
   .dbg_current_bit
 );
 
+
 ///////////////////////////////////////////////////////////////
 // Let's see if we can decode the biphase, and then run the
 // NRZ through a UART...
@@ -105,6 +106,37 @@ always_ff @(posedge clock) begin
     $display("NRZ counter overflow @ ", $time);
 end
 
+
+///////////////////////////////////////////////////////////////
+// Attempt to decode the NRZ out as 8-N-1 UART data.
+
+logic uart_data_valid;
+logic [7:0] uart_data_byte;
+
+uart_rx #(
+  .CLKS_PER_BIT(2 * ENCODER_SHORT_PULSE)
+) uart_rx (
+  .clock(clock), // Not sure why Quartus gave me an error with just .clock,
+  .reset(reset),
+
+  // Inputs
+  .rx_uart(nrz_out),
+
+  // Outputs
+  .data_valid(uart_data_valid),
+  .data_byte(uart_data_byte),
+
+  // Debugging
+  .state() // Intentional no-connection
+);
+
+always_ff @(posedge clock) begin
+  if (uart_data_valid)
+    $display("UART data received   @ ", $time, "           - DATA - ", 
+             uart_data_byte, " R");
+end
+
+
 ///////////////////////////////////////////////////////////////
 // Data driver for the test.
 // We want to test asserting the data_ready signal at all possible
@@ -129,8 +161,10 @@ always_ff @(posedge clock) begin
 
       if (last_busy_out) begin
         // We just got unbusy, cleared to send in a bit
+        /*
         $display("Moving to next round @ ", $time, " ", 
                  start_delay, " ", round_num, " ", last_busy_out);
+        */
         start_delay <= round_num;
         round_num <= round_num - 5'd1;
       end else begin
@@ -141,7 +175,8 @@ always_ff @(posedge clock) begin
       if (start_delay == 0 || 
           (round_num == 0 && last_busy_out)) begin
         $display("Starting to send     @ ", $time, " ", 
-                 start_delay, " ", round_num, " ", last_busy_out);
+                 start_delay, " ", round_num, " ", last_busy_out,
+                 "   - DATA - ", {1'b1, round_num, 2'b01}, " T");
         // Send the data!
         data_ready <= '1;
         data_in[7] <= '1;

@@ -97,3 +97,4 @@ Misc
 # References
 
 * [Quartus Verilog HDL Synthesis Attributes](https://www.intel.com/content/www/us/en/programmable/quartushelp/17.0/hdl/vlog/vlog_file_dir.htm)
+* [Verilog $display details](https://www.chipverify.com/verilog/verilog-display-tasks)
