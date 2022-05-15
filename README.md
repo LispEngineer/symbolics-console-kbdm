@@ -108,7 +108,11 @@ Notes to self to pick up mental state next time:
 * No received data at all at 116,150
 * At 146,810 dta is received late?
 
+*Key realization*
+* The biphase out long pulse length is 22, instead of the expected 20 clocks!!!
+
 # References
 
 * [Quartus Verilog HDL Synthesis Attributes](https://www.intel.com/content/www/us/en/programmable/quartushelp/17.0/hdl/vlog/vlog_file_dir.htm)
 * [Verilog $display details](https://www.chipverify.com/verilog/verilog-display-tasks)
+* [Visual Studio Code Color Themes](https://code.visualstudio.com/docs/getstarted/themes)

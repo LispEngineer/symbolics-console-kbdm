@@ -65,6 +65,22 @@ biphase_encoder #(
   .dbg_current_bit
 );
 
+// Delay the biphase out by a while to make it match with
+// the NRZ decoded, so we can see them together in the
+// output graph
+
+localparam NRZ_SYNCHRONIZER_LENGTH = 2;
+localparam BIPHASE_TO_NRZ_DELAY = 2 * ENCODER_SHORT_PULSE + NRZ_SYNCHRONIZER_LENGTH;
+
+// Shift from LSB to MSB
+logic [BIPHASE_TO_NRZ_DELAY-1:0] b2n_delay;
+logic biphase_out_delayed;
+
+always_ff @(posedge clock) begin
+  b2n_delay = {b2n_delay[BIPHASE_TO_NRZ_DELAY-2:0], biphase_out};
+end
+
+assign biphase_out_delayed = b2n_delay[BIPHASE_TO_NRZ_DELAY-1];
 
 ///////////////////////////////////////////////////////////////
 // Let's see if we can decode the biphase, and then run the
