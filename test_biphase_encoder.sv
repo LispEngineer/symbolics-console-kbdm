@@ -73,7 +73,7 @@ localparam NRZ_SYNCHRONIZER_LENGTH = 2;
 localparam BIPHASE_TO_NRZ_DELAY = 
   2 * ENCODER_SHORT_PULSE + // Length of a bit 
   NRZ_SYNCHRONIZER_LENGTH + // NRZ input synchronizer
-  1; // ?? Regular latency?
+  1; // ?? Regular latency for biphase decoder?
 
 // Shift from LSB to MSB
 logic [BIPHASE_TO_NRZ_DELAY-1:0] b2n_delay;
@@ -84,6 +84,10 @@ always_ff @(posedge clock) begin
 end
 
 assign biphase_out_delayed = b2n_delay[BIPHASE_TO_NRZ_DELAY-1];
+
+// If we wanted, we could now do a comparison between the
+// biphase_out_delayed and the nrz_out as they are now
+// cycle-for-cycle saying the same thing in biphase and NRZ encoding.
 
 ///////////////////////////////////////////////////////////////
 // Let's see if we can decode the biphase, and then run the

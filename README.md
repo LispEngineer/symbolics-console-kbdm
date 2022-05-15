@@ -103,16 +103,28 @@ Misc
 
 Notes to self to pick up mental state next time:
 
-* Simulation at point 24210 contains one bit error in UART decode on (32-value bit)
-* Errors continue until we hit the top of the encoder sequence plus one
-* No received data at all at 116,150
-* At 146,810 dta is received late?
+* We could make a FIFO so that he data we think we're transmitting
+  is put in, and the data we receive is compared to the head of that,
+  so that if the sender and receiver get out of lock-step it will
+  still work.
+* Example: 31,570 and 35,950 transmit before 35,970 receives the 31,570
+  transmission (these are ns in the simulation as of commit 17c0e81590242b57f5a06be0904bd7d1a6358c73
+
+## Fixed bugs
 
 *Key realization*
 * The biphase out long pulse length is 22, instead of the expected 20 clocks!!!
+  * FIX: The counter was counting from N to 0, instead of N-1 to 0, causing it to
+    run for one additional cycle (oops, typical off-by-one error).
 
 # References
 
 * [Quartus Verilog HDL Synthesis Attributes](https://www.intel.com/content/www/us/en/programmable/quartushelp/17.0/hdl/vlog/vlog_file_dir.htm)
 * [Verilog $display details](https://www.chipverify.com/verilog/verilog-display-tasks)
 * [Visual Studio Code Color Themes](https://code.visualstudio.com/docs/getstarted/themes)
+  * Add this to `settings.json` to make the editor background pure black:
+  ```
+    "workbench.colorCustomizations": {
+      "editor.background": "#000000"
+    }
+  ```

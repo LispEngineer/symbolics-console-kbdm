@@ -1,0 +1,38 @@
+{
+    "workbench.colorTheme": "Default Dark+",
+    "editor.autoClosingBrackets": "never",
+    "editor.autoClosingQuotes": "never",
+    "security.workspace.trust.untrustedFiles": "open",
+    "[plaintext]": {
+        // See https://www.reddit.com/r/vscode/comments/hye7sy/how_do_i_disable_intellisensesuggestions_for_my/
+        // See: https://code.visualstudio.com/docs/getstarted/settings#_language-specific-editor-settings
+        "editor.quickSuggestions": false,
+        "editor.wordBasedSuggestions": false,
+        "editor.suggest.showClasses": false,
+        "editor.suggest.showConstants": false,
+        "editor.suggest.showColors": false,
+        "editor.suggest.showCustomcolors": false,
+        "editor.suggest.showConstructors": false,
+        "editor.suggest.showEnums": false,
+        "editor.suggest.showEnumMembers": false,
+        "editor.suggest.showFields": false,
+        "editor.suggest.showEvents": false,
+        "editor.suggest.showFiles": false,
+        "editor.suggest.showFolders": false
+    },
+    "explorer.sortOrder": "modified",
+    "files.maxMemoryForLargeFilesMB": 8192,
+    "terminal.integrated.commandsToSkipShell": [
+        "language-julia.interrupt"
+    ],
+    "julia.symbolCacheDownload": true,
+    "julia.enableTelemetry": true,
+    "julia.environmentPath": "C:\\Program Files\\Julia-1.7.1\\",
+    "julia.executablePath": "C:\\Program Files\\Julia-1.7.1\\bin\\julia.exe",
+    "terminal.integrated.defaultProfile.windows": "PowerShell",
+    "terminal.integrated.shell.windows": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+    "workbench.editor.wrapTabs": true,
+    "workbench.colorCustomizations": {
+      "editor.background": "#000000"
+    }
+}
