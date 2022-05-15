@@ -70,7 +70,10 @@ biphase_encoder #(
 // output graph
 
 localparam NRZ_SYNCHRONIZER_LENGTH = 2;
-localparam BIPHASE_TO_NRZ_DELAY = 2 * ENCODER_SHORT_PULSE + NRZ_SYNCHRONIZER_LENGTH;
+localparam BIPHASE_TO_NRZ_DELAY = 
+  2 * ENCODER_SHORT_PULSE + // Length of a bit 
+  NRZ_SYNCHRONIZER_LENGTH + // NRZ input synchronizer
+  1; // ?? Regular latency?
 
 // Shift from LSB to MSB
 logic [BIPHASE_TO_NRZ_DELAY-1:0] b2n_delay;

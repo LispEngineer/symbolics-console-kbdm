@@ -56,7 +56,7 @@ module biphase_encoder #(
 
 localparam COUNTER_SIZE = $clog2(SHORT_PULSE);
 localparam COUNTER_1 = { {(COUNTER_SIZE-1){1'b0}}, 1'b1};
-localparam COUNTER_START = SHORT_PULSE[COUNTER_SIZE-1:0];
+localparam COUNTER_START = SHORT_PULSE[COUNTER_SIZE-1:0] - 1'b1;
 
 // Our half-bit counter
 logic [COUNTER_SIZE-1:0] out_counter = '0;
