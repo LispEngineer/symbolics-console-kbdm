@@ -30,9 +30,13 @@ This encoding is then converted to RS-422 logic levels and sent to the CPU.
 # Status
 
 * Biphase Encoder underway with test harness; incomplete!
+  * Current tests fully pass; more tests needed.
 
 # TODO
 
+* Expand the tests to send all possible bytes with a variety of delays between
+  them and make sure that they all get received correctly.
+  * Only make output if there are test failures.
 * Add a FIFO tied to the biphase encoder
   * This can be relatively small as it will be fed from two upstream FIFOs
   * This will be a single-byte FIFO
