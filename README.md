@@ -115,15 +115,10 @@ Misc
     total decoder latency.
 
 
-# DEBUGGING
+# Debugging Notes
 
-Notes to self to pick up mental state next time:
-
-* There is a strange thing at 130,690-139,290 now
-  * Looks like it tries to send two bytes one after the
-    other at 134,650 and 134,670, and the second one does
-    not get sent (of course, since the first one made the
-    encoder busy and so it ignored the second one).
+Notes to self to pick up mental state next time if I have to stop
+in the middle of a debugging session
 
 ## Fixed bugs
 

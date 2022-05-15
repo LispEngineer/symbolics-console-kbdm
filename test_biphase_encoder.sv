@@ -234,8 +234,7 @@ always_ff @(posedge clock) begin
         start_delay <= start_delay - 5'b1;
       end
 
-      if (start_delay == 0 || 
-          (round_num == 0 && last_busy_out)) begin
+      if (start_delay == 0) begin
         $display("Starting to send     @ ", $time, " ", 
                  start_delay, " ", round_num, " ", last_busy_out,
                  "   - DATA - ", next_to_send, " T");
