@@ -18,6 +18,13 @@ logic  reset;
 // Last byte sent to the encoder
 logic [7:0] last_sent_to_encoder;
 
+`ifndef IS_QUARTUS
+// QUARTUS DOES NOT SUPPORT SYSTEM VERILOG QUEUES
+// Queue of bytes sent to the encoder (to check against bytes received
+// by the decoder).
+logic [7:0] encoder_queue [$];
+`endif
+
 // generate clock to sequence tests
 always begin
   // 50 Mhz (one full cycle every 20 ticks at 1ns per tick per above)
@@ -173,9 +180,18 @@ uart_rx #(
 );
 
 always_ff @(posedge clock) begin
-  if (uart_data_valid)
+  if (uart_data_valid) begin
+    // Compare received byte to the last one sent & not received
+`ifndef IS_QUARTUS
+    // (QUARTUS does not support SystemVerilog queues)
     $display("UART data received   @ ", $time, "           - DATA - ", 
-             uart_data_byte, " R - DIFF: ", (last_sent_to_encoder - uart_data_byte));
+             uart_data_byte, " R - EXPECTED: ", encoder_queue[$],
+             "   DIFF: ", (encoder_queue[$] - uart_data_byte));
+    // Pop the byte off the encoder queue
+    // (cast to void as we're not using the encoded value)
+    void'(encoder_queue.pop_back());
+`endif
+  end
 end
 
 
@@ -227,6 +243,10 @@ always_ff @(posedge clock) begin
         data_ready <= '1;
         data_in <= next_to_send;
         last_sent_to_encoder <= next_to_send;
+`ifndef IS_QUARTUS
+        // (QUARTUS does not support SystemVerilog queues)
+        encoder_queue.push_front(next_to_send);
+`endif
       end
 
     end else begin

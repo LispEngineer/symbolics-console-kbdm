@@ -98,29 +98,32 @@ Misc
   * Tools -> Edit preference -> By Name -> Source -> OpenOnBreak: Set to '0' 
   * [Source](https://www.edaboard.com/threads/modelsim-error-assertion-causes-file-to-open.246441/)
 
-## Implementation Notes
+## Test Implementation Notes
 
 * Why is the test harness `data_ready` signal being asserted for two cycles? (If you look
   at the simulator output.)
   * We assert `data_ready`
   * Next cycle, biphase encoder sees it, asserts `busy_out`
   * Next cycle, we see `busy_out`, de-assert `data_ready` - hence two cycles
+* We use a SystemVerilog queue to store the bytes we (think we) send, to compare
+  with the bytes from the UART receiver, because sometimes the latency of sending
+  two characters quickly is faster than the UART can decode one.
+  * This happens when the delay between transmitter sends becomes less
+    than the latency of the UART byte decoder, which is at least 22
+    cycles for NRZ decoder and some more for UART. In practice once
+    the delay gets down to 24 it transmits the next byte faster than the
+    total decoder latency.
+
 
 # DEBUGGING
 
 Notes to self to pick up mental state next time:
 
-* We could make a FIFO so that he data we think we're transmitting
-  is put in, and the data we receive is compared to the head of that,
-  so that if the sender and receiver get out of lock-step it will
-  still work.
-* Example: 31,570 and 35,950 transmit before 35,970 receives the 31,570
-  transmission (these are ns in the simulation as of commit 17c0e81590242b57f5a06be0904bd7d1a6358c73
-  * This happens when the delay between transmitter sends becomes less
-    than the latency of the uart byte decoder, which is at least 22
-    cycles for nrz decoder and some more for uart. In practice once
-    the delay gets down to 24 it now goes faster.
-
+* There is a strange thing at 130,690-139,290 now
+  * Looks like it tries to send two bytes one after the
+    other at 134,650 and 134,670, and the second one does
+    not get sent (of course, since the first one made the
+    encoder busy and so it ignored the second one).
 
 ## Fixed bugs
 
@@ -140,3 +143,7 @@ Notes to self to pick up mental state next time:
       "editor.background": "#000000"
     }
   ```
+* SystemVerilog Queues 
+  [Reference_1](https://www.chipverify.com/systemverilog/systemverilog-queues)
+  [Reference_2](https://verificationguide.com/systemverilog/systemverilog-queue/)
+  * [Void casts](https://verificationacademy.com/forums/systemverilog/treating-stand-alone-use-function-implicit-void-cast)
