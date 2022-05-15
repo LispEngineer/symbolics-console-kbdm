@@ -36,16 +36,18 @@ add wave -noupdate -color Gray60 -radix binary /test_biphase_encoder/data_in
 add wave -noupdate -radix binary /test_biphase_encoder/next_to_send
 add wave -noupdate -divider {All Together}
 add wave -noupdate /test_biphase_encoder/last_sent_to_encoder
-add wave -noupdate /test_biphase_encoder/biphase_out
 add wave -noupdate /test_biphase_encoder/biphase_out_delayed
 add wave -noupdate /test_biphase_encoder/nrz_out
+add wave -noupdate -color {Dark Orchid} /test_biphase_encoder/dbg_current_bit_delayed
 add wave -noupdate /test_biphase_encoder/uart_data_byte
 add wave -noupdate /test_biphase_encoder/uart_data_valid
+add wave -noupdate /test_biphase_encoder/data_ready
+add wave -noupdate /test_biphase_encoder/busy_out
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {910000 ps} 0}
+WaveRestoreCursors {{Cursor 1} {35950000 ps} 0}
 quietly wave cursor active 1
-configure wave -namecolwidth 258
-configure wave -valuecolwidth 100
+configure wave -namecolwidth 271
+configure wave -valuecolwidth 70
 configure wave -justifyvalue left
 configure wave -signalnamewidth 2
 configure wave -snapdistance 10
@@ -58,4 +60,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {0 ps} {3381558 ps}
+WaveRestoreZoom {32089577 ps} {37966783 ps}

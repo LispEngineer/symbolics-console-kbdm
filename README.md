@@ -98,6 +98,13 @@ Misc
   * Tools -> Edit preference -> By Name -> Source -> OpenOnBreak: Set to '0' 
   * [Source](https://www.edaboard.com/threads/modelsim-error-assertion-causes-file-to-open.246441/)
 
+## Implementation Notes
+
+* Why is the test harness `data_ready` signal being asserted for two cycles? (If you look
+  at the simulator output.)
+  * We assert `data_ready`
+  * Next cycle, biphase encoder sees it, asserts `busy_out`
+  * Next cycle, we see `busy_out`, de-assert `data_ready` - hence two cycles
 
 # DEBUGGING
 
@@ -109,6 +116,11 @@ Notes to self to pick up mental state next time:
   still work.
 * Example: 31,570 and 35,950 transmit before 35,970 receives the 31,570
   transmission (these are ns in the simulation as of commit 17c0e81590242b57f5a06be0904bd7d1a6358c73
+  * This happens when the delay between transmitter sends becomes less
+    than the latency of the uart byte decoder, which is at least 22
+    cycles for nrz decoder and some more for uart. In practice once
+    the delay gets down to 24 it now goes faster.
+
 
 ## Fixed bugs
 

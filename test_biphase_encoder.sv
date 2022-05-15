@@ -89,6 +89,22 @@ assign biphase_out_delayed = b2n_delay[BIPHASE_TO_NRZ_DELAY-1];
 // biphase_out_delayed and the nrz_out as they are now
 // cycle-for-cycle saying the same thing in biphase and NRZ encoding.
 
+// Now do the same thing with the current bit debug output to more
+// easily compare with the NRZ out.
+localparam DCB_DELAY =  // DCB = dbg_current_bit
+  3 * ENCODER_SHORT_PULSE + // Length of a bit plus half bit lookahead
+  NRZ_SYNCHRONIZER_LENGTH + // NRZ input synchronizer
+  1; // ?? Regular latency for biphase decoder?
+
+logic [DCB_DELAY-1:0] dcb_delay;
+logic dbg_current_bit_delayed;
+
+always_ff @(posedge clock) begin
+  dcb_delay = {dcb_delay[DCB_DELAY-2:0], dbg_current_bit};
+end
+
+assign dbg_current_bit_delayed = dcb_delay[DCB_DELAY-1];
+
 ///////////////////////////////////////////////////////////////
 // Let's see if we can decode the biphase, and then run the
 // NRZ through a UART...
