@@ -36,8 +36,11 @@ localparam ENCODER_SHORT_PULSE = 10;
 localparam DECODER_SHORT_PULSE = 7; // 75%-ish of the encoder length
 localparam DECODER_IGNORE_PULSE = 3;
 
-localparam SEND_CHARS = 1_000;
+localparam SEND_CHARS = 10_000;
 localparam SEND_COUNTER_LEN = $clog2(SEND_CHARS);
+
+// Should we output non-error messages?
+localparam [0:0] SHOW_OUTPUT = '0; // '0 or '1
 
 //////////////////////////////////////////////////////////////
 // Our device under test - the biphase encoder
@@ -190,13 +193,19 @@ always_ff @(posedge clock) begin
     // Compare received byte to the last one sent & not received
 `ifndef IS_QUARTUS
     // (QUARTUS does not support SystemVerilog queues)
-    $display("UART data received   @ ", $time, "           - DATA - ", 
-             uart_data_byte, " R - EXPECTED: ", encoder_queue[$],
-             "   DIFF: ", (encoder_queue[$] - uart_data_byte));
+    if (SHOW_OUTPUT)
+      $display("UART data received   @ ", $time, "           - DATA - ", 
+               uart_data_byte, " R - EXPECTED: ", encoder_queue[$],
+               "   DIFF: ", (encoder_queue[$] - uart_data_byte));
 
     // Check for reception errors
-    if (uart_data_byte != encoder_queue[$])
+    if (uart_data_byte != encoder_queue[$]) begin
       received_errors <= received_errors + 1'b1;
+      $display("UART data *ERROR*    @ ", $time, "           - DATA - ", 
+               uart_data_byte, " R - EXPECTED: ", encoder_queue[$],
+               "   DIFF: ", (encoder_queue[$] - uart_data_byte),
+               " ***************");
+    end
 
     // Pop the byte off the encoder queue
     // (cast to void as we're not using the encoded value)
@@ -234,8 +243,9 @@ always_ff @(posedge clock) begin
       if (last_busy_out) begin
         // We just got unbusy, cleared to send in a bit
         random_delay = $urandom();
-        $display("Moving to next round @ ", $time, 
-                 " delay: ", random_delay);
+        if (SHOW_OUTPUT)
+          $display("Moving to next round @ ", $time, 
+                   " delay: ", random_delay);
         start_delay <= random_delay;
       end else begin
         // Wait until we send it
@@ -244,8 +254,9 @@ always_ff @(posedge clock) begin
 
       if (start_delay == 0) begin
         next_to_send = $urandom();
-        $display("Starting to send     @ ", $time, " ", 
-                 "          - DATA - ", next_to_send, " T");
+        if (SHOW_OUTPUT)
+          $display("Starting to send     @ ", $time, " ", 
+                   "          - DATA - ", next_to_send, " T");
         // Send the data!
         data_ready <= '1;
         data_in <= next_to_send;
