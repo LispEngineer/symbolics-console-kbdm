@@ -36,6 +36,9 @@ localparam ENCODER_SHORT_PULSE = 10;
 localparam DECODER_SHORT_PULSE = 7; // 75%-ish of the encoder length
 localparam DECODER_IGNORE_PULSE = 3;
 
+localparam SEND_CHARS = 1_000;
+localparam SEND_COUNTER_LEN = $clog2(SEND_CHARS);
+
 //////////////////////////////////////////////////////////////
 // Our device under test - the biphase encoder
 
@@ -162,6 +165,9 @@ end
 logic uart_data_valid;
 logic [7:0] uart_data_byte;
 
+logic [SEND_COUNTER_LEN-1:0] received_count = '0;
+logic [SEND_COUNTER_LEN-1:0] received_errors = '0;
+
 uart_rx #(
   .CLKS_PER_BIT(2 * ENCODER_SHORT_PULSE)
 ) uart_rx (
@@ -187,10 +193,16 @@ always_ff @(posedge clock) begin
     $display("UART data received   @ ", $time, "           - DATA - ", 
              uart_data_byte, " R - EXPECTED: ", encoder_queue[$],
              "   DIFF: ", (encoder_queue[$] - uart_data_byte));
+
+    // Check for reception errors
+    if (uart_data_byte != encoder_queue[$])
+      received_errors <= received_errors + 1'b1;
+
     // Pop the byte off the encoder queue
     // (cast to void as we're not using the encoded value)
     void'(encoder_queue.pop_back());
 `endif
+    received_count <= received_count + 1'b1;
   end
 end
 
@@ -201,6 +213,7 @@ end
 // points in the biphase encoder cycle. Since it uses a short pulse
 // of 10, it has 20 possible start points, so we will use 2^5 delay count
 // after busy is de-asserted to cover all the possibilities.
+
 
 // Send after a certain number of cycle delay
 logic [7:0] start_delay;
@@ -268,10 +281,22 @@ initial begin
 
   // Stop the simulation in due course.
   // TODO: Stop simulation after N errors or Y characters.
+  /*
   #500_000;
   $display("Ending simulation    @ ", $time);
   $stop; // $stop = breakpoint
   // DO NOT USE $finish; it will exit Questa!!!
+  */
+end
+
+always @(posedge clock) begin
+  // Check for simulation end
+  if (received_count >= SEND_CHARS) begin
+    $display("Ending simulation    @ ", $time);
+    $display("Received count: ", received_count);
+    $display("Received errors: ", received_errors);
+    $stop; // Breakpoint - do not use $finish as it will exit Questa
+  end
 end
 
 
