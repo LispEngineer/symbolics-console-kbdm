@@ -203,16 +203,13 @@ end
 // after busy is de-asserted to cover all the possibilities.
 
 // Send after a certain number of cycle delay
-logic [4:0] round_num;
-logic [4:0] start_delay;
+logic [7:0] start_delay;
+logic [7:0] random_delay;
 logic       last_busy_out;
 logic [7:0] next_to_send;
 
-// Make the byte we send each time different.
-assign next_to_send = {1'b1, round_num, 2'b01};
-
-// Send a character every time it is not busy,
-// after waiting a different number of cycles each time.
+// Send a random byte every time it is not busy,
+// after waiting a random number of cycles.
 always_ff @(posedge clock) begin
 
   last_busy_out <= busy_out;
@@ -223,21 +220,19 @@ always_ff @(posedge clock) begin
 
       if (last_busy_out) begin
         // We just got unbusy, cleared to send in a bit
-        /*
-        $display("Moving to next round @ ", $time, " ", 
-                 start_delay, " ", round_num, " ", last_busy_out);
-        */
-        start_delay <= round_num;
-        round_num <= round_num - 5'd1;
+        random_delay = $urandom();
+        $display("Moving to next round @ ", $time, 
+                 " delay: ", random_delay);
+        start_delay <= random_delay;
       end else begin
         // Wait until we send it
         start_delay <= start_delay - 5'b1;
       end
 
       if (start_delay == 0) begin
+        next_to_send = $urandom();
         $display("Starting to send     @ ", $time, " ", 
-                 start_delay, " ", round_num, " ", last_busy_out,
-                 "   - DATA - ", next_to_send, " T");
+                 "          - DATA - ", next_to_send, " T");
         // Send the data!
         data_ready <= '1;
         data_in <= next_to_send;
@@ -256,8 +251,7 @@ always_ff @(posedge clock) begin
   end else begin
     // Reset
     data_ready <= '0;
-    round_num <= 5'b1_1111;
-    start_delay <= 5'b1_1111;
+    start_delay <= 8'b0001_0000;
   end
 
 end // Send different bytes after different delays
@@ -272,10 +266,9 @@ initial begin
   reset <= 1'b1; 
   #22; reset <= 1'b0;
 
-  // Stop the simulation at appropriate point.
-  // 20 clocks x 10 bits = 200 clocks x 10ns per clock = 2000ns,
-  // plus up to 32 clocks between, run at least 32 times
-  #200_000;
+  // Stop the simulation in due course.
+  // TODO: Stop simulation after N errors or Y characters.
+  #500_000;
   $display("Ending simulation    @ ", $time);
   $stop; // $stop = breakpoint
   // DO NOT USE $finish; it will exit Questa!!!

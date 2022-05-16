@@ -117,6 +117,8 @@ Misc
     cycles for NRZ decoder and some more for UART. In practice once
     the delay gets down to 24 it transmits the next byte faster than the
     total decoder latency.
+* We send random bytes after random delays over and over again, and make sure
+  that the biphase decoded, UART decoded bytes received are the same.
 
 
 # Debugging Notes
