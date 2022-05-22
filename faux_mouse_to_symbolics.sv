@@ -73,11 +73,11 @@ localparam MOVE_DELAY_1 = { {(MOVE_DELAY_SIZE-1){1'b0}}, 1'b1 };
 // Returns a MOVE_DELAY_SIZE-bit value (the current highest value
 // is only 20 bits long with the default SHORT_PULSE).
 module delay_by_speed #(
-  parameter SHORT_PULSE = 333,
+  parameter SHORT_PULSE = 333
 ) (
   input  logic [2:0]  mouse_speed,
   output logic [MOVE_DELAY_SIZE_MAX:0] delay_count
-)
+);
 
 localparam DELAY_BASE = SHORT_PULSE * 2 * 32; 
 
@@ -87,7 +87,7 @@ localparam DELAY_1   = DELAY_BASE * 2  - 1;
 localparam DELAY_2   = DELAY_BASE * 4  - 1;
 localparam DELAY_3   = DELAY_BASE * 6  - 1;
 localparam DELAY_4   = DELAY_BASE * 8  - 1;
-localparam DELAY_5   = DELAY_BASE * 12 - 1
+localparam DELAY_5   = DELAY_BASE * 12 - 1;
 localparam DELAY_6   = DELAY_BASE * 16 - 1;
 localparam MAX_DELAY = DELAY_BASE * 32 - 1;
 
@@ -110,8 +110,8 @@ endmodule
 module faux_mouse_to_symbolics #(
   parameter SHORT_PULSE = 333 // 6⅔ µs at 50MHz
 ) (
-  input logic clk,  // system-wide clock
-  input logic rst,  // system-wide reset
+  input logic clock,  // system-wide clock
+  input logic reset,  // system-wide reset
 
   // User inputs
   input  logic       mouse_up,
@@ -141,7 +141,7 @@ localparam MIN_DELAY_START = MIN_DELAY[MIN_DELAY_SIZE-1:0] - 1'b1;
 
 // What buttons are currently down
 logic [2:0] current_buttons;
-assign current_buttons = {button_left, button_middle, button_right);
+assign current_buttons = {button_left, button_middle, button_right};
 
 // What direction we want to move, if any;
 // don't simultaneously assert opposing directions
@@ -157,7 +157,7 @@ end
 logic [MOVE_DELAY_SIZE_MAX:0] current_delay;
 // This module is combinational, so it's like an always_comb.
 delay_by_speed #(
-  .SHORT_PULSE
+  .SHORT_PULSE(SHORT_PULSE) // can't do just .SHORT_PULSE with Quartus 21.1
 ) delay_by_speed (
   .mouse_speed,
   .delay_count(current_delay)
@@ -173,12 +173,12 @@ logic [MOVE_DELAY_SIZE_MAX:0] move_delay_counter;
 // Next value for each counter (current minus 1)
 logic [MIN_DELAY_SIZE-1:0] next_min_delay_counter;
 logic [MOVE_DELAY_SIZE_MAX:0] next_move_delay_counter;
-assign next_min_delay_counter <= min_delay_counter - MIN_DELAY_1;
-assign next_move_delay_counter <= move_delay_counter - MOVE_DELAY_1;
+assign next_min_delay_counter  = min_delay_counter  - MIN_DELAY_1;
+assign next_move_delay_counter = move_delay_counter - MOVE_DELAY_1;
 
 // can we not move (is the move counter not 0)?
 logic cannot_move;
-assign cannot_move = move_delay_count != 0;
+assign cannot_move = move_delay_counter != 0;
 
 // can we not send anything (min delay not 0)?
 logic cannot_send;
