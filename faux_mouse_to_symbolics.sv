@@ -192,82 +192,78 @@ always @(posedge clock) begin
     last_sent_buttons <= '0;
     data_ready <= '0;
 
-  end else begin
-
-    if (busy) begin
-      // The encoder is busy, so there is nothing for us to do
-      // but wait our turn.
-      if (cannot_send)
-        min_delay_counter <= next_min_delay_counter;
-      if (cannot_move)
-        move_delay_counter <= next_move_delay_counter;
-      
-      data_ready <= '0;
-
-    end else if (data_ready) begin
-      // We want to send data, but the encoder didn't yet
-      // start transmitting it (isn't busy), so let's just wait for it
-      // to become busy.
-
-      // DO NOTHING about our counters.
-      // If our current command is a not a move command, though, we
-      // could decrement our move delay counter if we wanted.
-      assert(!busy);
-
-      // TODO: We should track how often this happens, and how long
-      // it happens for, if we care.
-
-    end else if (cannot_send) begin
-      // We just recently sent something, so we can't do anything yet
-      // until our next reasonable opportunity. 
-
-      assert(!data_ready); // We're not waiting to start sending something
+  end else if (busy) begin
+    // The encoder is busy, so there is nothing for us to do
+    // but wait our turn.
+    if (cannot_send)
       min_delay_counter <= next_min_delay_counter;
-      if (cannot_move)
-        move_delay_counter <= next_move_delay_counter;
+    if (cannot_move)
+      move_delay_counter <= next_move_delay_counter;
+    
+    data_ready <= '0;
+
+  end else if (data_ready) begin
+    // We want to send data, but the encoder didn't yet
+    // start transmitting it (isn't busy), so let's just wait for it
+    // to become busy.
+
+    // DO NOTHING about our counters.
+    // If our current command is a not a move command, though, we
+    // could decrement our move delay counter if we wanted.
+    assert(!busy);
+
+    // TODO: We should track how often this happens, and how long
+    // it happens for, if we care.
+
+  end else if (cannot_send) begin
+    // We just recently sent something, so we can't do anything yet
+    // until our next reasonable opportunity. 
+
+    assert(!data_ready); // We're not waiting to start sending something
+    min_delay_counter <= next_min_delay_counter;
+    if (cannot_move)
+      move_delay_counter <= next_move_delay_counter;
 
 
-    end else if (current_buttons != last_sent_buttons) begin
-      // We have to send some button presses.
-      // This takes precedence over sending mouse movement
-      // codes.
+  end else if (current_buttons != last_sent_buttons) begin
+    // We have to send some button presses.
+    // This takes precedence over sending mouse movement
+    // codes.
 
-      // Set the data_out (see protocol.md in c5g_symdec)
-      // for a mouse button change.
-      data_out <= {
-        1'b1,   // always 1
-        3'b000, // mouse button command
-        // next nibble: LMRF (F = fourth button, not implemented)
-        current_buttons,
-        1'b0 // fourth button;
-      };
-      data_ready <= '1;
-      last_sent_buttons <= current_buttons;
-      min_delay_counter <= MIN_DELAY_START;
+    // Set the data_out (see protocol.md in c5g_symdec)
+    // for a mouse button change.
+    data_out <= {
+      1'b1,   // always 1
+      3'b000, // mouse button command
+      // next nibble: LMRF (F = fourth button, not implemented)
+      current_buttons,
+      1'b0 // fourth button;
+    };
+    data_ready <= '1;
+    last_sent_buttons <= current_buttons;
+    min_delay_counter <= MIN_DELAY_START;
 
-      // We still have to update our move delay counter, but
-      if (cannot_move)
-        move_delay_counter <= next_move_delay_counter;
+    // We still have to update our move delay counter, but
+    if (cannot_move)
+      move_delay_counter <= next_move_delay_counter;
 
-    end else if (!cannot_move && current_direction != '0) begin
-      // We want to move a certain direction and can do it
-      // based upon our previous speed.
+  end else if (!cannot_move && current_direction != '0) begin
+    // We want to move a certain direction and can do it
+    // based upon our previous speed.
 
-      // Set the data_out (see protocol.md in c5g_symdec)
-      // for a mouse move
-      data_out <= {
-        1'b1,   // always 1
-        3'b001, // mouse button command
-        // next nibble: LRUD
-        current_direction
-      };
-      data_ready <= '1;
-      min_delay_counter <= MIN_DELAY_START;
-      move_delay_counter <= current_delay;
+    // Set the data_out (see protocol.md in c5g_symdec)
+    // for a mouse move
+    data_out <= {
+      1'b1,   // always 1
+      3'b001, // mouse button command
+      // next nibble: LRUD
+      current_direction
+    };
+    data_ready <= '1;
+    min_delay_counter <= MIN_DELAY_START;
+    move_delay_counter <= current_delay;
 
-    end // Mouse handling "state machine"
-
-  end // reset or not
+  end // Mouse handling "state machine"
 
 end // always clock
 
