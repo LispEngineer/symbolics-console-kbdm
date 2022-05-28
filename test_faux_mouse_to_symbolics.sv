@@ -94,6 +94,10 @@ initial begin
   reset <= 1'b0;
 
   // Set what commands we are sending
+  // Minimum command interval is 6,800 ns
+  
+  // Move up for 25us
+  $display("Move up @", $time);
   mouse_up <= '1;
   mouse_down <= '0;
   mouse_left <= '0;
@@ -104,9 +108,40 @@ initial begin
   button_middle <= '0;
 
   mouse_speed <= 3'd0;
+  #25_000;
+
+  // Nothing for 10us
+  $display("Done moving @", $time);
+  mouse_up <= '0;
+  #10_000;
+
+  // Double click left button
+  $display("Double click left button @", $time);
+  button_left <= '1;
+  #3_500;
+  button_left <= '0;
+  #10_500;
+  button_left <= '1;
+  #7_200;
+  button_left <= '0;
+  #12_000;
+
+  // Click and move at the same time
+  $display("Middle click & move slower @", $time);
+  mouse_speed <= 3'd1;
+  button_middle <= '1;
+  mouse_down <= '1;
+  mouse_left <= '1;
+  #2_000;
+  button_middle <= '0;
+  #33_000;
+  mouse_left <= '0;
+  #17_000;
+  mouse_down <= '0;
+  $display("Done moving @", $time);
+  #15_000;
 
   // Stop the simulation in due course.
-  #50_000;
   $display("Ending simulation    @ ", $time);
   $stop; // $stop = breakpoint
   // DO NOT USE $finish; it will exit Questa!!!

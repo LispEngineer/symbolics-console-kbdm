@@ -60,12 +60,6 @@ always_ff @(posedge clk) begin
       busy <= '1;
     end
 
-    // TODO: Move this duplicated code elsewhere
-    if (counter == 0)
-      counter <= COUNTER_START;
-    else
-      counter <= counter - COUNTER_1;
-
   end else if (counter == 0) begin
 
     // We're in the midst of sending a packet
@@ -76,7 +70,7 @@ always_ff @(posedge clk) begin
     // 0 = we're now idle
     //
     // We only do work when our counter is zero
-    assert(!busy);
+    assert(busy);
 
     bit_counter <= bit_counter - 4'd1;
 

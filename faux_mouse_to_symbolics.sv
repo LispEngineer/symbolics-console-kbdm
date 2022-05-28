@@ -228,8 +228,7 @@ always @(posedge clock) begin
     min_delay_counter <= next_min_delay_counter;
     if (cannot_move)
       move_delay_counter <= next_move_delay_counter;
-
-
+      
   end else if (current_buttons != last_sent_buttons) begin
     // We have to send some button presses.
     // This takes precedence over sending mouse movement
@@ -267,6 +266,10 @@ always @(posedge clock) begin
     data_ready <= '1;
     min_delay_counter <= MIN_DELAY_START;
     move_delay_counter <= current_delay;
+
+  end else if (cannot_move) begin
+    // We cannot move - keep counting until we can!
+    move_delay_counter <= next_move_delay_counter;
 
   end // Mouse handling "state machine"
 
