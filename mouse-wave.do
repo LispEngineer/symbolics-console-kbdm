@@ -39,7 +39,7 @@ add wave -noupdate /test_faux_mouse_to_symbolics/dut/next_move_delay_counter
 add wave -noupdate /test_faux_mouse_to_symbolics/dut/cannot_move
 add wave -noupdate /test_faux_mouse_to_symbolics/dut/cannot_send
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {830000 ps} 0}
+WaveRestoreCursors {{Cursor 1} {7430000 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 317
 configure wave -valuecolwidth 100
