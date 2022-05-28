@@ -30,8 +30,17 @@ This encoding is then converted to RS-422 logic levels and sent to the CPU.
 # Status
 
 * Simple mouse emulator (4 directions & 3 buttons & several speeds)
-  * Underway
-* Biphase Encoder test harness: complete
+  * "Faux" mouse encoder: complete
+  * Simple waveform test harness for "faux" mouse encoder: complete
+  * Actual inputs for mouse encoder: UNSTARTED
+    * External button de-bouncer
+    * Speed selector using rotary encoder (optional) vs. three switches
+  * Output to RS422 sender for biphase encoded mouse data: UNSTARTED
+  * Duplicated mouse data sent out as non-biphase UART: UNSTARTED
+    (to monitor on the Analog Discovery 2 before attaching the real CPU)
+  * Testing the faux mouse
+* Biphase Encoder: complete
+  * Test harness including decoder: complete
 
 # TODO
 
@@ -53,7 +62,8 @@ This encoding is then converted to RS-422 logic levels and sent to the CPU.
 
 ## TODONE
 
-* `DONE` Expand the tests to send all possible bytes with a variety of delays between
+* `DONE` Expand the biphase encoder tests to send all possible bytes
+  with a variety of delays between
   them and make sure that they all get received correctly.
   * Only make output if there are test failures.
 
