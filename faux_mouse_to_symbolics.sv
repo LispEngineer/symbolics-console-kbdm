@@ -59,6 +59,11 @@
 //   the minimum; we can send once zero
 // * Timer until we can send a mouse move event; this gets set to
 //   the current mouse move speed when we send a move command.
+//
+// Open questions:
+// * Is it possible for the real console to send more than one mouse
+//   button down concurrently? (I don't think so, so we might need
+//   to make it impossible to do that here too.)
 
 // FIXME: Have a parameter shared between both modules on the
 // length of the delay_by_speed. How do we do this without letting
@@ -125,8 +130,8 @@ module faux_mouse_to_symbolics #(
 
   // I/O to the biphase encoder
   input  logic       busy,
-  output logic       data_ready,
-  output logic [7:0] data_out
+  output logic       data_ready = '0,
+  output logic [7:0] data_out = 'X
 );
 
 localparam COUNTER_SIZE = $clog2(SHORT_PULSE);

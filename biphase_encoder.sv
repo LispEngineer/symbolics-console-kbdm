@@ -47,7 +47,7 @@ module biphase_encoder #(
 
   output logic biphase_out, // data output (balanced except during reset)
   output logic clock_out,   // the generated clock (probably not useful)
-  output logic busy,        // TODO: When asserted, we cannot accept any data
+  output logic busy,        // When asserted, we cannot accept any data and ignore data_ready
 
   // Debugging outputs
   output logic dbg_first_half,
