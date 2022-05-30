@@ -54,11 +54,10 @@ module c5g_symenc(
 	// 0,2 are dedicated clock inputs
 	// 3-18 are Arduino I/O
 	// 16, 18 are PLL clock outputs
-  
 );
 
-//=======================================================
-//  REG/WIRE declarations
+// =======================================================
+// Signal declarations
 
 // Main signals throughout the board
 logic clock;
@@ -70,8 +69,24 @@ logic [6:0] HEX2, HEX3;
 // 7 Segment outputs
 logic [6:0] ss0, ss1, ss2, ss3;
 
+// The output of 75 kHz biphase encoded RS422 transmit to the CPU
 logic biphase_out;
+logic biphase_busy;
 
+// Our "Faux Mouse" inputs
+logic mouse_direction_up;
+logic mouse_direction_down;
+logic mouse_direction_left;
+logic mouse_direction_right;
+logic mouse_button_left;
+logic mouse_button_middle;
+logic mouse_button_right;
+logic [2:0] mouse_speed;
+
+// Outputs from the faux mouse encoder
+// which are also inputs to the biphase encoder.
+logic mouse_data_ready;
+logic [7:0] mouse_data;
 
 // ======================================================
 // DEFAULTS (remove if using these pins)
@@ -86,17 +101,23 @@ assign SD_CLK = '0;
 // Bidi pins - set them to high impedance
 assign SRAM_D = 'z;
 assign {SD_CMD, SD_DAT} = 'z;
-// Rest of GPIO used for HEX2-3
+
+// GPIO 35-22 used for HEX2-3
 // GPIO 5 = Biphase encoded data stream out
-assign GPIO[21:6] = 'z;
+// TODO: GPIO 5 = UART encoded data stream out
+// GPIO 15-12 = mouse direction button input
+assign GPIO[21:16] = 'z;
+assign GPIO[11:6] = 'z;
 assign GPIO[4:0] = 'z;
 
-//=======================================================
-//  Structural coding
+// =======================================================
+// Main clock and reset
 
-// Pick our main clock and reset
 assign clock = CLOCK_50_B5B;
 assign reset = ~KEY[0];
+
+// =======================================================
+// Hex encoders
 
 // Our HEX2-3 overlap with GPIO;
 assign GPIO[28:22] = HEX2;
@@ -127,26 +148,81 @@ seven_segment hex3 (
   .hex(ss3)
 );
 
+/////////////////////////////////////////////////////////
+// Faux mouse to Symbolics encoder
 
-// Hook up our encoder
-assign GPIO[5] = biphase_out;
+faux_mouse_to_symbolics mouse_encoder (
+	.clock, .reset,
+
+	// "Faux mouse" inputs
+  .mouse_up(mouse_direction_up),
+  .mouse_down(mouse_direction_down),
+  .mouse_left(mouse_direction_left),
+  .mouse_right(mouse_direction_right),
+  .button_left(mouse_button_left),
+  .button_middle(mouse_button_middle),
+  .button_right(mouse_button_right),
+  .mouse_speed,
+
+	// Is the biphase output encoder busy?
+  .busy(biphase_busy),
+
+	// What should we send via the biphase encoder
+  .data_ready(mouse_data_ready),
+  .data_out(mouse_data)
+);
+
+
+/////////////////////////////////////////////////////////
+// Biphase encoder (using the mouse data)
 
 biphase_encoder biphase_enc (
   .clk(clock),
   .rst(reset),
 
-  // TODO
-  .data_ready('0), .data_in('0),
+  // Inputs from the mouse encoder
+  .data_ready(mouse_data_ready), 
+	.data_in(mouse_data),
 
   // Our encoded data stream output
+	.busy(biphase_busy),
   .biphase_out(biphase_out),
 
-  // TODO
-  .clock_out(), .busy(),
+  // Unneeded
+  .clock_out(), 
 
   // TODO: Debugging outputs
   .dbg_first_half(), .dbg_current_bit()
 );
+
+
+///////////////////////////////////////////////////////////
+// GPIO Inputs & Outputs
+
+// Hook up our encoder to send to the RS422 UART input
+assign GPIO[5] = biphase_out;
+
+// Our "faux mouse" input
+
+// 4 directional buttons from a Digilent PmodBTN
+//   https://digilent.com/shop/pmod-btn-4-user-pushbuttons/
+//   0 = up, 1 = right, 2 = left, 3 = down
+//   Fully debounced and Schmitt-triggered
+//   Logic high when pressed
+// mapped to GPIO 12-15
+assign mouse_direction_up    = GPIO[12];
+assign mouse_direction_down  = GPIO[13];
+assign mouse_direction_left  = GPIO[14];
+assign mouse_direction_right = GPIO[15];
+
+// Use the mouse buttons from the console of the FPGA board.
+// Logic LOW when pressed (unlike the above).
+assign mouse_button_left   = ~KEY[3];
+assign mouse_button_middle = ~KEY[2];
+assign mouse_button_right  = ~KEY[1];
+
+// The speed is set in binary from the first three switches
+assign mouse_speed = SW[2:0];
 
 
 

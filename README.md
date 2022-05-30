@@ -2,6 +2,23 @@
 
 *Copyright 2022 Douglas P. Fields, Jr. All Rights Reserved.*
 
+# Cyclone V GX Inputs & Outputs
+
+Used for the faux mouse
+* Button 0: reset
+  * Note, the manual calls these "keys" and they are logic LOW when pressed
+* Buttons 3-1: Left, middle, right mouse buttons
+* GPIO 5: Biphase output to console
+* TODO: GPIO 6: Non-biphase output (for debugging by a UART decoder)
+* GPIO 15-12: "Mouse" direction control buttons
+* Switches 2-0: "Mouse" speed
+
+Some notes on this board's GPIO:
+* 0, 2 = Dedicated clock inputs
+* 3-18 = also on Arduino header
+* 16, 18 = PLL clock outputs
+* 22-35 = HEX 2-3
+
 # Block Diagram
 
 PS/2 mouse initializer -> PS/2 mouse decoder -> 
@@ -44,6 +61,10 @@ This encoding is then converted to RS-422 logic levels and sent to the CPU.
 
 # TODO
 
+* Add a UART non-biphase out from the biphase encoder?
+  (So that a regular UART decoder can see the biphase data.)
+  This may be harder than it seems simply because the encoder can decide to change
+  the output bit half way through it (and does take advantage of that).
 * Add a FIFO tied to the biphase encoder
   * This can be relatively small as it will be fed from two upstream FIFOs
   * This will be a single-byte FIFO
@@ -163,3 +184,4 @@ in the middle of a debugging session
   [Reference_1](https://www.chipverify.com/systemverilog/systemverilog-queues)
   [Reference_2](https://verificationguide.com/systemverilog/systemverilog-queue/)
   * [Void casts](https://verificationacademy.com/forums/systemverilog/treating-stand-alone-use-function-implicit-void-cast)
+* Digilent [Pmod BTN](https://digilent.com/shop/pmod-btn-4-user-pushbuttons/)
