@@ -94,9 +94,11 @@ logic [7:0] mouse_data;
 // ======================================================
 // DEFAULTS (remove if using these pins)
 
-// Output pins
-assign LEDG = '0;
-assign LEDR = '0;
+// Output pins (not used for monitoring... yet)
+assign LEDG[1] = '0;
+assign LEDG[4] = '0;
+assign LEDR[6:4] = '0;
+
 assign UART_TX = '0;
 assign {SRAM_A, SRAM_CE_n, SRAM_LB_n, SRAM_OE_n, SRAM_UB_n, SRAM_WE_n} = '0;
 assign SD_CLK = '0;
@@ -242,9 +244,9 @@ assign GPIO[6] = uart_out;
 //   Logic high when pressed
 // mapped to GPIO 12-15
 assign mouse_direction_up    = GPIO[12];
-assign mouse_direction_down  = GPIO[13];
+assign mouse_direction_down  = GPIO[15];
 assign mouse_direction_left  = GPIO[14];
-assign mouse_direction_right = GPIO[15];
+assign mouse_direction_right = GPIO[13];
 
 // Use the mouse buttons from the console of the FPGA board.
 // Logic LOW when pressed (unlike the above).
@@ -253,8 +255,23 @@ assign mouse_button_middle = ~KEY[2];
 assign mouse_button_right  = ~KEY[1];
 
 // The speed is set in binary from the first three switches
-assign mouse_speed = SW[2:0];
+assign mouse_speed = SW[9:7];
 
+
+// Monitor the inputs and outputs on the LEDS
+assign LEDG[0] = reset;
+assign LEDG[7] = mouse_button_left;
+assign LEDG[6] = mouse_button_middle;
+assign LEDG[5] = mouse_button_right;
+// Direction LEDs in the hjkl order (LDUR)
+assign LEDR[3] = mouse_direction_left;
+assign LEDR[2] = mouse_direction_down;
+assign LEDR[1] = mouse_direction_up;
+assign LEDR[0] = mouse_direction_right;
+assign LEDR[9:7] = mouse_speed;
+
+assign LEDG[2] = biphase_out;
+assign LEDG[3] = uart_out;
 
 
 endmodule

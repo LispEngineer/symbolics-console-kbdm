@@ -4,20 +4,30 @@
 
 # Cyclone V GX Inputs & Outputs
 
-Used for the faux mouse
+Inputs used for the faux mouse:
 * Button 0: reset
   * Note, the manual calls these "keys" and they are logic LOW when pressed
 * Buttons 3-1: Left, middle, right mouse buttons
 * GPIO 5: Biphase output to console
 * GPIO 6: Non-biphase output (for debugging by a UART decoder)
 * GPIO 15-12: "Mouse" direction control buttons
-* Switches 2-0: "Mouse" speed
+  * Using Digilent Pmod BTN, logic HIGH when pressed
+* Switches 9-7: "Mouse" speed
+
+LED outputs:
+* Green 0: reset
+* Green 7-5: Mouse buttons
+* Red 3-0: Mouse direction buttons
+* Red 9-7: Mouse speed
+* Green 2, 3: Biphase, UART outputs
 
 Some notes on this board's GPIO:
 * 0, 2 = Dedicated clock inputs
 * 3-18 = also on Arduino header
 * 16, 18 = PLL clock outputs
 * 22-35 = HEX 2-3
+
+
 
 # Block Diagram
 
@@ -160,7 +170,15 @@ Misc
 # Debugging Notes
 
 Notes to self to pick up mental state next time if I have to stop
-in the middle of a debugging session
+in the middle of a debugging session.
+
+Note on using the Altera USB-Blaster and the Digilent Analog Discovery 2:
+These two things cannot be plugged into the computer simultaneously, or
+the Altera/Quartus FPGA programmer will not see the FPGA. Apparently they
+use the same FTDI chip or something. I have gotten it to work accidentally
+once; I imagine the USB enumerator put them in a different order or something,
+but in general, you need to unplug the Analog Discovery 2 if you want to use
+the USB interface to the Cyclone V GX Starter Kit.
 
 ## Fixed bugs
 
