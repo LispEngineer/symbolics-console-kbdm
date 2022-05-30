@@ -9,7 +9,7 @@ Used for the faux mouse
   * Note, the manual calls these "keys" and they are logic LOW when pressed
 * Buttons 3-1: Left, middle, right mouse buttons
 * GPIO 5: Biphase output to console
-* TODO: GPIO 6: Non-biphase output (for debugging by a UART decoder)
+* GPIO 6: Non-biphase output (for debugging by a UART decoder)
 * GPIO 15-12: "Mouse" direction control buttons
 * Switches 2-0: "Mouse" speed
 

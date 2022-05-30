@@ -73,6 +73,9 @@ logic [6:0] ss0, ss1, ss2, ss3;
 logic biphase_out;
 logic biphase_busy;
 
+// Conversion of our biphase signal to UART signal
+logic uart_out;
+
 // Our "Faux Mouse" inputs
 logic mouse_direction_up;
 logic mouse_direction_down;
@@ -104,10 +107,10 @@ assign {SD_CMD, SD_DAT} = 'z;
 
 // GPIO 35-22 used for HEX2-3
 // GPIO 5 = Biphase encoded data stream out
-// TODO: GPIO 5 = UART encoded data stream out
+// GPIO 6 = UART encoded data stream out
 // GPIO 15-12 = mouse direction button input
 assign GPIO[21:16] = 'z;
-assign GPIO[11:6] = 'z;
+assign GPIO[11:7] = 'z;
 assign GPIO[4:0] = 'z;
 
 // =======================================================
@@ -195,12 +198,40 @@ biphase_encoder biphase_enc (
   .dbg_first_half(), .dbg_current_bit()
 );
 
+///////////////////////////////////////////////////////////
+// Wire up biphase decoder and send the decoded UART
+// information to another external GPIO (module biphase_to_nrz).
+// (This seems easier to do than to add UART output to the
+// biphase encoder.)
+
+biphase_to_nrz biphase_uart (
+  .clk(clock),
+  .rst(reset),
+
+	// Inputs
+  .biphase_in_raw(biphase_out),
+
+	// Outputs
+  .nrz_out(uart_out),
+	// Unused outputs
+  .clock_out(),
+  .data_received(),
+  .framing_error(),
+  .glitch_ignored(),
+
+	// Debugging outputs
+  .counter_overflow()
+);
+
 
 ///////////////////////////////////////////////////////////
 // GPIO Inputs & Outputs
 
 // Hook up our encoder to send to the RS422 UART input
 assign GPIO[5] = biphase_out;
+// And also a debugging output of the same data (a few clocks delayed)
+// in UART format (but still 75 kHz)
+assign GPIO[6] = uart_out;
 
 // Our "faux mouse" input
 
