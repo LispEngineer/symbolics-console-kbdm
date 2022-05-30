@@ -19,6 +19,7 @@ LED outputs:
 * Green 7-5: Mouse buttons
 * Red 3-0: Mouse direction buttons
 * Red 9-7: Mouse speed
+* Hex display: Mouse speed setting (0 is fastest, 7 is slowest)
 * Green 2, 3: Biphase, UART outputs
 
 Some notes on this board's GPIO:
@@ -26,7 +27,6 @@ Some notes on this board's GPIO:
 * 3-18 = also on Arduino header
 * 16, 18 = PLL clock outputs
 * 22-35 = HEX 2-3
-
 
 
 # Block Diagram

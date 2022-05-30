@@ -91,6 +91,9 @@ logic [2:0] mouse_speed;
 logic mouse_data_ready;
 logic [7:0] mouse_data;
 
+// The input to the 4 digit hex display
+logic [15:0] hexin;
+
 // ======================================================
 // DEFAULTS (remove if using these pins)
 
@@ -137,19 +140,19 @@ assign HEX3 = ~ss3;
 
 // Show data on hex 0-3
 seven_segment hex0 (
-  .num(4'hA),
+  .num(hexin[3:0]),
   .hex(ss0)
 );
 seven_segment hex1 (
-  .num(4'hB),
+  .num(hexin[7:4]),
   .hex(ss1)
 );
 seven_segment hex2 (
-  .num(4'hF),
+  .num(hexin[11:8]),
   .hex(ss2)
 );
 seven_segment hex3 (
-  .num(4'hD),
+  .num(hexin[15:12]),
   .hex(ss3)
 );
 
@@ -256,6 +259,8 @@ assign mouse_button_right  = ~KEY[1];
 
 // The speed is set in binary from the first three switches
 assign mouse_speed = SW[9:7];
+assign hexin[15:3] = '0;
+assign hexin[2:0] = mouse_speed;
 
 
 // Monitor the inputs and outputs on the LEDS
